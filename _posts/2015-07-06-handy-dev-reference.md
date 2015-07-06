@@ -688,6 +688,207 @@ TrailingSpaces - show trailing space
 {% highlight text %}
 {% endhighlight %}
 
+## Groovy
+### List
+{% highlight groovy %}
+// 
+// indexOf & lastIndexOf
+// 
+['a', 'b', 'a', 'c'].lastIndexOf('a')    // 2
+['a', 'b', 'a', 'c'].lastIndexOf('d')    // -1
+ 
+
+// 
+// each & eachWithIndex
+// 
+['a','b','c'].each { elem ->
+    println elem
+}
+ 
+['k1':'v1', 'k2':'v2'].each { k, v ->
+    println "$k = $v"
+}
+ 
+// eachWithIndex
+['a','b','c'].eachWithIndex { elem, i ->
+    println "$i : $elem"
+}
+
+// 
+// any & every
+// 
+// any one matches, return TRUE
+['a','bb','ccc'].any { elem ->
+    elem.length() < 3
+}
+ 
+// all match, return TRUE
+['a','bb','ccc'].every { elem ->
+    elem.length() < 3
+}
+
+// 
+// grep
+// 
+// collect
+def newList = ['a', 'ab', 'abc'].grep {elem ->
+    elem.length() < 3
+}
+ 
+// regex
+def newList = ['a', 'ab', 'abc'].grep(~/../)
+ 
+// intersection
+def list1 = ['a', 'b', 'c']
+def list2 = ['x', 'a', 'c']
+def inter = list1.grep(list2) // ['a','c']
+
+// 
+// join
+// 
+['2007','10','20'].join('-') // 2007-10-20
+
+// 
+// sort
+// 
+[3, 1, 5].sort() // [1, 3, 5]
+['b', 'a', 'c'].sort() // ['a', 'b', 'c']
+ 
+ 
+// asc, equals to aList.sort()
+[3, 1, 5].sort { a, b ->
+    a <=> b
+} // [1, 3, 5]
+ 
+// desc
+[3, 1, 5].sort { a, b ->
+    a <=> b
+} // [5, 3, 1]
+
+// 
+// sort list of customized object
+// 
+// User { id, name}
+[new User(id:8, name:'Tom'), new User(id:5, name:'Jack')].sort { a, b ->
+    a.id <=> b.id
+} //[user(5), user(8)]
+
+// 
+// random sort
+// 
+[1,2,3,4,5].sort {
+    Math.random()
+}
+
+// 
+// find & findAll
+// 
+// first matched element
+[1,3,5].find( elem ->
+    elem < 5
+} // 1
+ 
+// all matched element
+[1,3,5].find( elem ->
+    elem < 5
+} // [1,3]
+
+// 
+// collect
+// 
+// process element and place result into a new collection
+def newList = [1, 2, 3].collect { elem ->
+    elem * 2
+} // [2, 4, 6]
+ 
+ 
+def newMap = ['k1':'v1', 'k2':'v2'].collect { entry -> 
+    "${entry.key}a : ${entry.value}a"
+} // ['k1a':'v1a', 'k2a':'v2a']
+
+// 
+// groupBy
+// 
+def list = ['a', 'b', 'abc', 'ab', 'c', 'bc']
+list.groupBy { elem ->
+    elem.length()
+}
+ 
+result: [1:["a", "b", "c"], 2:["ab", "bc"], 3:["abc"]]
+
+//inject
+// 
+// reverse
+// 
+['a', 'b', 'c'].reverse() // ['c', 'b', 'a']
+
+// 
+// reverse with more process
+// 
+def listX = ['Tom Cheng','Mike Wang','Jack Deng']
+def listY = []
+listX.reverseEach{
+    def names = it.split(' ')
+    listY << names[0]
+}
+println listY // ['Jack', 'Mike', 'Tom']
+
+// 
+// tokenize
+// 
+'a1/a2/a3'.tokenize('/') // ['a1', 'a2', 'a3']
+
+// 
+// unique - remove duplicate element
+['a', 'b', 'a', 'b'].unique() // ['a', 'b']
+// 
+// max & min
+[1, 5, 2].max() // 5
+[1, 5, 2].min() // 1
+// 
+// count
+['a', 'ab', 'a'].count('a') // 2
+'abaa'.count('a') // 3
+// 
+// sum
+[1,2,3].sum() // 6
+['a','b','c'].sum() // abc
+// 
+// intersection
+def listX = ['a', 'a', 'b', 'c']
+def listY = ['a', 'c', 'c']
+ 
+listX.intersect(listY) // ['a', 'c', 'c']
+ 
+listX.unique().intersect(listY.unique()) // ['a', 'c']
+// 
+// union
+def listX = ['a', 'a', 'b', 'c']
+def listY = ['a', 'c', 'c']
+ 
+listX+listY // ['a', 'a', 'b', 'c', 'a', 'c', 'c']
+ 
+(listX + listY).unique() // ['a', 'b', 'c']
+// 
+// has "union'' not
+['a','b','c','d'].disjoint(['e', 'f', 'a']) // false, b/c has Union
+['a','b','c','d'].disjoint(['e', 'f', 'g']) // true, b/c NO Union
+ 
+// 
+// in, count
+println (1 in [1, 2, 3]) // true
+println (4 in [1, 2, 3]) // false
+ 
+println ([1, 1, 3].count(1)) // 2
+println (['a', 'b', 'a'].count('a')) // 2
+println (['a', 'b', 'a'].count('c')) // 2
+
+// 
+// containsAll
+def listX = ['a', 'b', 'c', 'd']
+listX.containsAll(['a', 'd']) // true
+listX.containsAll(['a', 'e']) // false
+{% endhighlight%}
 
 ## Jenkins
 ### GIT plugin Environment Valirables
