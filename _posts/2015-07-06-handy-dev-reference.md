@@ -1,0 +1,757 @@
+---
+layout:     post
+title:      Handy Development Reference
+date:       2015-07-06 14:37:19
+summary:    Daily reference
+categories: dev
+tags: dev ref
+---
+
+## Git
+
+### Ref
+{% highlight bash %}
+#-------------------------------------------
+# Merge and Rebase
+#-------------------------------------------
+# Merge: merge into current branch; current branch is "master"
+# Rabase: rebase onto given branch; current branch is "feature-test"
+ 
+# Rebase
+git checkout -b feature-test
+# edit and commit into feature-test
+# some change committed on master
+git rebase master
+# might need solve conflict
+ 
+# Merge
+git checkout master
+git merge feature-test
+git push
+# might need solve conflict
+git branch -d feature-test       # remove feature branch
+
+#-------------------------------------------
+# Overwrite a branch with another one
+#   better_branch => master
+#-------------------------------------------
+git checkout better_branch
+git merge --strategy=ours master    # keep the content of this branch, but record a merge
+git checkout master
+git merge better_branch             # fast-forward master up to the merge
+
+#-------------------------------------------
+# branch, tag
+#-------------------------------------------
+ 
+# List branch
+git branch                                  # list available branches
+git branch -a                               # list all (local+remote)
+git branch -r                               # list remote only
+ 
+# Create branch
+git checkout <branch|tag>                   # switch branch
+git checkout -b <branch>                    # create and checkout
+git checkout -b <new> [existing]            # create branch base on given branch/tag/commit
+git branch <branch>                         # create
+ 
+# Delete
+git branch -d <branch>                      # delete local
+git push origin :<branch>                   # delete remote
+git push origin --delete <branch>           # delete remote
+git branch -D <branch>                      # force delete
+
+# Rename
+git branch -m <new_name>                    # rename current branch
+git branch -m <old_name> <new_name>         # rename
+ 
+#-------------------------------------------
+# tag
+#-------------------------------------------
+git tag                                     # list
+git tag 1.7.1                               # create lightweight tags
+git tag 1.5.1 -m 'Release 1.5.1'            # create tag base on current branch's head version
+git tag 1.5.1 -m 'version 1.5' <commitId>   # create tag base on commit id
+git checkout <tag>                          # checkout tag
+git push origin <tag>                       # push a tag
+git push origin tag <tag>
+git tag -d 1.5.1                            # delete tag
+ 
+ 
+git tag 1.0                                 # create
+git push origin 1.0                         # push to remote
+git tag -d 1.0                              # delete local tag
+git push --delete origin 1.0                # delete remote tag
+ 
+ 
+#-------------------------------------------
+# config
+#-------------------------------------------
+# define the author
+git config user.name <name>                              # current repo only
+git config --global user.name <name>                     # all repo
+git config --global user.email <email>
+ 
+git config --global alias.<alias-name> <git-command>     # command shortcut
+git config --system core.editor <editor command>         # define the editor
+git config --global --edit                               # open global configuration file
+ 
+git config --global branch.autosetuprebase always        # for each 'pull', rebase first
+
+#-------------------------------------------
+# stash
+#-------------------------------------------
+# did some change, not commit yet, and wanna switch to another job, e.g. pull
+ 
+git stash           # hide
+git pull            # do new job
+git stash apply     # get back
+ 
+ 
+ 
+git stash list               # list all
+git stash apply stash@{1}    # get back specific change
+git stash pop                # get back the latest change
+git stash drop <id>          # delete ONE
+git stash clear              # delete ALL
+
+ 
+#-------------------------------------------
+# clean
+#-------------------------------------------
+git clean -df                                 # rm untracked files and directories, but not files specified by .gitignore
+git clean -dfxn                               # dry run: rm all untracked files+dirs, include files specified by .gitignore
+git clean -dfx                                # rm all untracked files+dirs
+ 
+#-------------------------------------------
+# grep
+#-------------------------------------------
+git grep Xyz                           # search current branch
+git grep Xyz <branch>                  # search specified branch
+git grep -c Xyz                        # how many matched
+git grep -n Xyz                        # show line number
+git grep -e term1 --and -e term2       # AND
+git grep --all-match -e term1 -e term2 # OR
+git grep -e term1 --and \(-e term2 -e term3\) # term1 and (term2 or term3)
+ 
+#-------------------------------------------
+# handy
+#-------------------------------------------
+# Print HEAD version
+cat .git/HEAD
+cat .git/refs/heads/master
+
+git add -i                     # interactively add
+
+git log --oneline              # single line
+git log --stat                 # file list and +/- count
+git log -p                     # file content
+git log --author="Vic"         # find by author
+git log --grep="<pattern>"     # grep content
+git log <file>                 # include specific file
+git log --graph --decorate --oneline # branch relationship
+git push origin master         # specify remote branch
+ 
+git reset                     # reset staging area, leave working dir unchanged
+git reset --hard              # reset staging area and working dir
+ 
+git show                      # HEAD
+git show HEAD~                # previous version
+ 
+git rev-parse HEAD            # Current Version
+ 
+gitk <branch1> <branch2>      # Show log diff between two branches
+ 
+git diff <newVer> <oldVer>    # Compare two commits
+ 
+# set tracking info
+git branch --set-upstream-to=origin/<parent-branch> <your-branch>
+ 
+# compare 2 branches
+git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative master..feature-x
+ 
+ 
+# drop uncommit change
+git checkout prj1/main.py
+
+#-------------------------------------------
+# clean copy
+#-------------------------------------------
+git fetch                               # fetch from remote
+git reset --hard origin/<branch>        # align with remote
+git clean -dfx                          # clean all untracked files
+
+#-------------------------------------------
+# Remove a commit
+#-------------------------------------------
+# Scenario 1: local commits not pushed yet
+git reset --hard origin/<branch>
+ 
+# Scenario 2: local commits pushed, remove latest 3 commits
+git reset --hard HEAD~3
+git push origin HEAD --force
+
+#-------------------------------------------
+# Split a commit into multiple ones
+#-------------------------------------------
+git rebase -i 
+# mark 'edit'
+# ctrl+X
+git reset HEAD^
+git add file1
+git commit 'first part of split commit'
+git add file2
+git commit 'second part of split commit'
+git rebase --continue
+
+#-------------------------------------------
+# Modify recent commit
+#-------------------------------------------
+# Edit hello.py and main.py
+git add hello.py
+git commit
+ 
+# Realize you forgot main.py
+git add main.py
+git commit --amend --no-edit
+ 
+# hello.py and main.py in same commits
+
+
+#-------------------------------------------
+# XX
+#-------------------------------------------
+git commit -a -m 'commit 1'
+git commit -a -m 'commit 2'
+git reset --hard HEAD~2               // remove recent 2 commits
+
+#-------------------------------------------
+# Undo a commit
+#-------------------------------------------
+git commit ... // commit done
+git reset --soft 'HEAD^'
+... edit ...
+git add ..
+git commit -c ORIG_HEAD
+
+
+#-------------------------------------------
+# XX
+#-------------------------------------------
+
+{% endhighlight %}
+
+
+
+### Git Flow Sample
+{% highlight bash %}
+# master, develop, release, hotfix, feature
+ 
+# init develop branch
+git branch develop
+git push -u origin develop
+ 
+# developers init local copy
+git clone ssh://user@host/path/to/repo.git
+git checkout -b develop origin/develop
+ 
+# ------------------------------------------
+# feature development
+# ------------------------------------------
+# begin with new feature
+git checkout -b feature-helloworld develop
+... modify
+git status
+git add <some-file>
+git commit -m 'log msg'
+ 
+# finish the feature
+git pull origin develop
+git checkout develop              // switch branch
+git merge feature-helloworld
+git push
+git branch -d feature-helloworld  // drop feature branch
+ 
+# ------------------------------------------
+# release
+# ------------------------------------------
+git checkout -b release-0.1 develop
+...bugfix and ready to ship
+ 
+# merge to master
+git checkout master
+git merge release-0.1
+git push
+ 
+# merge to develop
+git checkout develop
+git merge release-0.1
+git push
+git branch -d release-0.1        // drop branch, if needed
+ 
+# tag
+git tag -a 0.1 -m "Initial public release" master
+git push --tags
+ 
+# ------------------------------------------
+# production bug fix
+# ------------------------------------------
+git checkout -b issue-#001 master
+... fix bug
+git checkout master
+git merge hotfix-#001
+git push
+git checkout develop
+git merge hotfix-#001
+git push
+git branch -d hotfix-#001
+{% endhighlight %}
+
+
+### Where is the git configuration file
+{% highlight bash %}
+# Repo specific (HIGH)
+<repo>/.git/config
+ 
+# User specific
+~/.gitconfig
+ 
+# System wide (LOW)
+/etc/gitconfig
+{% endhighlight %}
+
+
+### How to setup a workspace only includes what you want?
+As of `Git 1.7`
+{% highlight bash %}
+# 1. clone
+git clone git @bitbucket.org:Propellerhead/uconnect.git
+
+# 2. open feature
+git config core.sparsecheckout true
+ 
+# 3. add the module or files you want
+echo build.gradle > .git/info/sparse-checkout
+echo settings.gradle >> .git/info/sparse-checkout
+echo nz.co.uconnect.config >> .git/info/sparse-checkout
+ 
+# 4. take effect
+git read-tree -m -u HEAD
+
+
+
+# You can also EXCLUDE something
+#   .git/info/sparse-checkout
+*
+!unwanted
+
+# How to get all back?
+#   Deleting sparse-checkout file WON'T work, you must, modify it as
+*
+
+
+
+{% endhighlight%}
+
+
+
+### .gitignore
+#### Description
+{% highlight text %}
+# THIS IS COMMENT
+*.a       # ignore all files which name ends with ".a"
+!lib.a    # keep lib.a
+/TODO     # ignore file "TODO" under root dir (exclude subdir/TODO)
+build/    # ignore any folder named "build"
+doc/*.txt # ignore doc/*.txt
+/*/.projects # ignore /1stLevelDir/.projects
+{% endhighlight %}
+
+#### Sample file
+{% highlight text %}
+## generic
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+*.bak
+Thumb.db
+buildEclipseProjFile.bat
+local_build.txt
+how_to_get_ivu_data.txt
+#java specific
+*.class
+*.jar
+!gradle-wrapper.jar
+*.class
+*.war
+*.par
+.dbshell
+# ignore build folders
+build
+target
+bin
+classes
+dist
+temp
+servers
+common.core/generated/
+common.build/deployment/old/
+#eclipse specific
+.classpath
+.project
+.sonar
+.settings
+.externalToolBuilders
+.ant-targets-build.xml
+.metadata
+#idea
+.idea
+*.iml
+# ivy
+ivy-cache
+#gradle
+.gradle
+artifacts
+artifacts.xml
+gradle-local.properties
+localRepository
+#merge
+*.orig
+*.log
+{% endhighlight %}
+
+
+## On-off setup
+Configuring Git 
+{% highlight bash %}
+git config --global user.name "Vic Liu"
+git config --global user.email "vic.liu@xx.yy"
+git config --global color.ui auto
+{% endhighlight %}
+
+
+
+## Linux
+
+### Commands
+{% highlight bash %}
+# chmod
+# 1:Exe, 2:Write, 4:Read
+# 664: Owner-RW, Group-R, Other-R
+chmod 644 file.html
+# 755: Owner-ERW, Group-ER, Other-ER
+$ chmod 755 file.html
+
+#
+# diff files
+#
+sdiff file1.txt file2.txt
+sdiff dir1/ dir2/
+
+#
+# unzip specific file
+#
+unzip -p my.zip path/to/zipped/file.txt > theFile.txt
+unzip -p my.zip path/to/zipped/file.txt // to console
+
+
+#
+# tcpdump
+#
+tcpdump -vvnnSX dst port 5006 and dst host 172.31.225.100
+
+#
+# list file sorted by date descending
+#
+ls -rt
+
+#
+# pretty-print XML
+#
+cat xyz.xml | xmllint --format - | less
+
+#
+# create dummy big file
+#
+fallocate -l 50M big.zip
+
+#
+# Linux distribution / kernel 
+#
+lsb_release -a
+uname -a
+uname -mrs
+
+#
+# content only from file 2
+#
+grep -Fvxf file1 file2
+
+
+{% endhighlight %}
+
+
+## Code snippet
+#### Spring: create JNDI naming context
+{% highlight java %}
+public CoreDaoTestBase() {
+    EmbeddedDatabase dbRtJbossTisp = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).setName("db-test-rtJbossTisp").build();
+    EmbeddedDatabase dbDwStaging = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).setName("db-test-dwArtaStaging").build();
+    SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
+    builder.bind("java:/RealtimeJbossTispDS", dbRtJbossTisp);
+    builder.bind("java:/DwArtaStagingDS", dbDwStaging);
+     
+    try {
+        builder.activate();
+    } catch (IllegalStateException ise) {
+        throw new RuntimeException(ise);
+    } catch (NamingException ne) {
+        throw new RuntimeException(ne);
+    }
+}
+{% endhighlight %}
+
+
+
+## Misc
+
+### Source Layout
+http://repo.springsource.org/release/org/springframework/spring-library/
+{% highlight text %}
+[project name]/
+    src/
+        main/
+            java/           java
+            scala/          scala; any other lanuages, go at the same level, etc. groovy
+            resources/      resources for the project
+            filters/        resorces filter files
+            assembly/       assembly descriptor
+            config/         configuration files
+            webapp/         web app
+                WEB-INF/
+                    jsp/
+
+        test/
+            java/           test sources
+            resource/       test resources
+            filters/        test resource filters
+        site/               project web site source
+        doc/                other docs
+    lib/                    if not using Maven/Gradle, better checkin the dependent 3rd party libs
+        runtime/            lib required at runtime
+        test/               lib required to run tests
+        build/              lib required to build the project
+{% endhighlight %}
+
+
+### Spring lib description
+{% highlight text %}
+spring.jar              //include all classes except spring-mock.jar
+ 
+// Required
+spring-core.jar         //framework + util
+spring-beans.jar        //access configuration file, manage bean and IoC related
+ 
+// Optional
+spring-aop.jar          //AOP feature, e.g. declarative trans management
+spring-context.jar      //Extension: ApplicationContext,JNDI,UIIntegration(Velocity,Freemarker..), Validation
+ 
+spring-dao.jar          //Spring DAO, Transaction
+spring-hibernate.jar    //integrate with Hibernate
+spring-jdbc.jar         //integrate with JDBC
+spring-orm.jar          //DAO extension, e.g. iBATIS, JDO, OJB, TopLink; relises on spring.dao.jar
+ 
+spring-remoting.jar     //Remote call, EJB, JMS, RMI, Hessian, JAX-RPC, etc.
+spring-support.jar      //Cache,JCA,JMX,JavaMail,Scheduling,etc.
+spring-web.jar          //Core classes touched by web development, include auto load WebApplicationContext
+spring-webmvc.jar       //Spring MVC framework, i18n, tag, theme,..
+spring-mock.jar         //test lib
+ 
+spring-context
+  spring-aop
+    spring-beans
+      spring-core
+ 
+spring-dao [core,bean,aop,context]
+spring-web [core,bean,context]
+spring-webmvc [core,bean,context,web]
+spring-hibernate [core,bean,aop,dao,jdbc,orm,web,webmvc]
+{% endhighlight %}
+
+
+### Availability & Downtime
+|Availability %|Downtime per year|Downtime per month*|Downtime per week|
+|---|---|---|---|
+|90%|36.5 days|72 hours|16.8 hours|
+|95%|18.25 days|36 hours|8.4 hours|
+|98%|7.30 days|14.4 hours|3.36 hours|
+|99%|3.65 days|7.20 hours|1.68 hours|
+|99.5%|1.83 days|3.60 hours|50.4 minutes|
+|99.8%|17.52 hours|86.23 minutes|20.16 minutes|
+|99.9% ("three nines")|8.76 hours|43.2 minutes|10.1 minutes|
+|99.95%|4.38 hours|21.56 minutes|5.04 minutes|
+|99.99% ("four nines")|52.6 minutes|4.32 minutes|1.01 minutes|
+|99.999% ("five nines")|5.26 minutes|25.9 seconds|6.05 seconds|
+|99.9999% ("six nines")|31.5 seconds|2.59 seconds|0.605 seconds|
+
+
+
+### NodeJS
+* 2 spaces for indention
+* Use \n
+* No tailing whitespaces
+* Use ;
+* Use single quote
+* Declare one variable per line
+* use lowerCamelCase for variable, properties and function names
+* use UpperCamelCase for class names
+* use UPPERCASE for constant
+* Method chaining
+{% highlight javascript %}
+user
+  .findOne({ name: 'foo' })
+  .populate('bar')
+  .exec(function(err, user) {
+    return true;
+  });
+{% endhighlight %}
+* Name yoru closures
+{% highlight javascript %}
+req.on('end', function onEnd() {
+  console.log('winning');
+});
+{% endhighlight %}
+* Crazy shit need to stay away from: `Object.freeze`,`Object.preventExtensions`,`Object.seal`, `with`, `eval`
+* add use `restrict` to each JS file
+* err is the first parameter
+
+
+
+
+
+### Good Sublime Plugins
+DocBlockr - https://github.com/spadgos/sublime-jsdocs
+Markdown preview - https://github.com/revolunet/markdown-preview
+Git - https://github.com/kemayo/sublime-text-git
+GitGutter - https://github.com/jisaacks/GitGutter
+Emmet - quick html/js/css code generater
+SublimeCodeIntel - code hint
+TrailingSpaces - show trailing space
+
+
+## Templates
+### web.xml (servlet 2.5)
+{% highlight xml %}
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="AVL_RAPID_Service" version="2.5"
+    xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <filter>
+        <filter-name>myFilter</filter-name>
+        <filter-class>servlets.SimpleServletFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <url-pattern>*.simple</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>
+{% endhighlight %}
+
+
+
+{% highlight text %}
+{% endhighlight %}
+
+
+## Jenkins
+### GIT plugin Environment Valirables
+* GIT_COMMIT - SHA of the current
+* GIT_BRANCH - Name of the branch currently being used, e.g. "master" or "origin/foo"
+* GIT_PREVIOUS_COMMIT - SHA of the previous built commit from the same branch (the current SHA on first build in branch)
+* GIT_URL - Repository remote URL
+* GIT_URL_N - Repository remote URLs when there are more than 1 remotes, e.g. GIT_URL_1, GIT_URL_2
+* GIT_AUTHOR_EMAIL - Committer/Author Email
+* GIT_COMMITTER_EMAIL - Committer/Author Email
+
+### Groovy script for checking nodes status
+run it on http://JENKINS_SERVER/script
+{% highlight groovy %}
+import hudson.model.*
+import hudson.node_monitors.*
+import hudson.slaves.*
+import java.util.concurrent.*
+jenkins = Hudson.instance
+ 
+def getEnviron(computer) {
+   def env
+   def thread = Thread.start("Getting env from ${computer.name}", { env = computer.environment })
+   thread.join(2000)
+   if (thread.isAlive()) thread.interrupt()
+   env
+}
+def slaveAccessible(computer) {
+    getEnviron(computer)?.get('PATH') != null
+}
+ 
+def numberOfflineNodes = 0
+def numberNodes = 0
+for (slave in jenkins.slaves) {
+   def computer = slave.computer
+   numberNodes ++
+   println ""
+   println "Checking computer ${computer.name}:"
+   def isOK = (slaveAccessible(computer) && !computer.offline)
+   if (isOK) {
+     println "\t\tOK, got PATH back from slave ${computer.name}."
+     println('\tcomputer.isOffline: ' + slave.getComputer().isOffline());
+     println('\tcomputer.isTemporarilyOffline: ' + slave.getComputer().isTemporarilyOffline());
+     println('\tcomputer.getOfflineCause: ' + slave.getComputer().getOfflineCause());
+     println('\tcomputer.offline: ' + computer.offline);
+      
+      
+   } else {
+     numberOfflineNodes ++
+     println "  ERROR: can't get PATH from slave ${computer.name}."
+     println('\tcomputer.isOffline: ' + slave.getComputer().isOffline());
+     println('\tcomputer.isTemporarilyOffline: ' + slave.getComputer().isTemporarilyOffline());
+     println('\tcomputer.getOfflineCause: ' + slave.getComputer().getOfflineCause());
+     println('\tcomputer.offline: ' + computer.offline);
+     //sendMail(computer.name, slave.getComputer().getOfflineCause().toString())
+     if (slave.getComputer().isTemporarilyOffline()) {
+      if (!slave.getComputer().getOfflineCause().toString().contains("Disconnected by")) {
+         computer.setTemporarilyOffline(false, slave.getComputer().getOfflineCause())       
+      }
+     } else {
+         computer.connect(true) 
+     }
+   }
+ }
+println ("Number of Offline Nodes: " + numberOfflineNodes)
+println ("Number of Nodes: " + numberNodes)
+{% endhighlight %}
