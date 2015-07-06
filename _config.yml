@@ -1,43 +1,55 @@
-markdown: redcarpet
-pygments: true
+# Site settings
+title:       Vic Liu
+tagline:     Coding
+#email:       your_email@example.com
+author:      Vic Liu
+#description: "A simple, beautiful theme for Jekyll that emphasizes content rather than aesthetic fluff."
+baseurl:     ""
+url:         "http://vicly.github.io"
 
+# Google analytics
+google_analytics:
+
+# Optional features
+animated:           false
+show_related_posts: true
+show_post_footers:  false
+
+# Disqus post comments
+# (leave blank to disable Disqus)
+disqus_shortname:
+
+# Social icons
+show_social_icons: false
+github_username:
+stackoverflow_id:
+twitter_username:
+google_plus_id:
+linkedin_username:
+angellist_username:
+bitcoin_url:
+paypal_url:
+flattr_button:
+
+# Post sharing icons
+show_sharing_icons: false
+share_text: 'Share this post!'
+# Change to 'true' to enable individual icons
+share_facebook: false
+share_twitter: false
+share_googleplus: false
+share_linkedin: false
+share_digg: false
+share_tumblr: false
+share_reddit: false
+share_stumbleupon: false
+share_hackernews: false
+
+# Build settings
+markdown:     redcarpet
 redcarpet:
-  extensions: ["tables"]
-
-# Permalinks
-# Use of `relative_permalinks` ensures post links from the index work properly.
-permalink:           pretty
-relative_permalinks: true
-
-# Setup
-title:               Vic Liu
-tagline:             Coding
-url:                 http://vicly.github.io
-paginate:            5
-baseurl:             ""
-#baseurl:             "https://github.com/vicly/vicly.github.io/"
-
-# Assets
-# We specify the directory for Jekyll so we can use @imports.
+  extensions: ['smart', 'tables', 'with_toc_data']
+permalink:    pretty
+paginate:     5
 sass:
-  sass_dir:          _sass
-  style:            :compressed
-
-# About/contact
-author:
-  name:              'Vic Liu'
-#  url:               https://twitter.com/mdo
-#  email:             markdotto@gmail.com
-
-
-# Custom vars
-version:             2.0.0
-github:
-  repo:              https://github.com/vicly/vicly.github.io
-
-
-# Allow URL Redirects:
-#  * https://help.github.com/articles/redirects-on-github-pages
-gems:
-  - jekyll-redirect-from
-
+  compressed: true
