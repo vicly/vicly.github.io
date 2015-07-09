@@ -13,7 +13,8 @@ layout: default
   {% if page.update_date %}
     <span class="post-meta">Updated: {{ page.update_date | date: "%b %-d, %Y" }}</span><br>
   {% endif %}
-  <span class="post-meta small">{{ minutes }} minute read</span>
+  <span class="post-meta small">{{ minutes }} minute read</span><br>
+  <span class="post-meta small"><a href="{{ page.url }}#disqus_thread" data-disqus-identifier="{{ page.id }}">Comments</a></span>
 </div>
 
 <article class="post-content">
@@ -41,6 +42,17 @@ layout: default
     })();
   </script>
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script type="text/javascript">
+    var disqus_shortname  = '{{ site.disqus_shortname }}';
+    (function () {
+      var s = document.createElement('script'); s.async = true; s.type = 'text/javascript';
+      s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+      (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+  </script>
+
 {% endif %}
 
 {% if site.show_related_posts %}
