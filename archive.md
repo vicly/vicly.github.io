@@ -12,8 +12,6 @@ title: Archive
 
 ## Tags
 
-<ul>
 {% for tag in site.tags %}
-  <li><a class="tag_list_link" href="/tag/{{ tag[0] }}">{{ tag[0] }}</a></li>
+ * [{{tag[0]}}]("/tag/{{ tag[0] }}")
 {% endfor %}
-</ul>
