@@ -494,7 +494,7 @@ grep -Fvxf file1 file2
 
 
 ## Code snippet
-#### Spring: create JNDI naming context
+### Spring: create JNDI naming context
 {% highlight java %}
 public CoreDaoTestBase() {
     EmbeddedDatabase dbRtJbossTisp = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).setName("db-test-rtJbossTisp").build();
@@ -632,13 +632,13 @@ req.on('end', function onEnd() {
 
 
 ### Good Sublime Plugins
-DocBlockr - https://github.com/spadgos/sublime-jsdocs
-Markdown preview - https://github.com/revolunet/markdown-preview
-Git - https://github.com/kemayo/sublime-text-git
-GitGutter - https://github.com/jisaacks/GitGutter
-Emmet - quick html/js/css code generater
-SublimeCodeIntel - code hint
-TrailingSpaces - show trailing space
+* DocBlockr - https://github.com/spadgos/sublime-jsdocs
+* Markdown preview - https://github.com/revolunet/markdown-preview
+* Git - https://github.com/kemayo/sublime-text-git
+* GitGutter - https://github.com/jisaacks/GitGutter
+* Emmet - quick html/js/css code generater
+* SublimeCodeIntel - code hint
+* TrailingSpaces - show trailing space
 
 
 ## Templates
