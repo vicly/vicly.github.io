@@ -4,7 +4,9 @@ title:      Gradle Reference
 date:       2015-07-06 16:53:19
 summary:    Some Gradle related code snappet
 categories: dev
-tags: dev gradle ref
+tags:
+- gradle
+- ref
 ---
 
 

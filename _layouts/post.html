@@ -7,17 +7,24 @@ layout: default
 {% assign minutes = 1 %}
 {% endif %}
 
-<div id="toc"></div>
-
 <div class="post-header mb2">
   <h1>{{ page.title }}</h1>
-  <span class="post-meta">{{ page.date | date: "%b %-d, %Y" }}</span><br>
+  <span class="post-meta">{{ page.date | date: "%b %-d, %Y" }}</span> | 
   {% if page.update_date %}
-    <span class="post-meta">Updated: {{ page.update_date | date: "%b %-d, %Y" }}</span><br>
+    <span class="post-meta">Updated: {{ page.update_date | date: "%b %-d, %Y" }}</span> | 
   {% endif %}
-  <span class="post-meta small">{{ minutes }} minute read</span><br>
-  <span class="post-meta small"><a href="{{ page.url }}#disqus_thread" data-disqus-identifier="{{ page.id }}">Comments</a></span>
+  <!-- 
+  {{ comment }}
+  <span class="post-meta small">{{ minutes }} minute read</span> | 
+  {{ endcomment}}
+  -->
+  <span class="post-meta small"><a href="{{ page.url }}#disqus_thread" data-disqus-identifier="{{ page.id }}">Comments</a></span> |
+  <span class="post-meta small">Tags:
+    {% for tag in page.tags %}<a class="tag_list_link" href="/tag/{{ tag }}">{{ tag }}</a> {% endfor %}
+  </span>
 </div>
+
+<div id="toc"></div>
 
 <article class="post-content">
   {{ content }}
@@ -71,6 +78,6 @@ layout: default
 
 <script type="text/javascript">
 $(document).ready(function() {
-    $('#toc').toc();
+    $('#toc').toc({ title:'Table of Content', headers:'h1, h2, h3',});
 });
 </script>

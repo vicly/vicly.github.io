@@ -4,7 +4,9 @@ title:      Handy Development Reference
 date:       2015-07-06 14:37:19
 summary:    Daily reference
 categories: dev
-tags: dev ref
+tags:
+- git
+- ref
 ---
 
 ## Git
@@ -430,6 +432,7 @@ git config --global user.name "Vic Liu"
 git config --global user.email "vic.liu@xx.yy"
 git config --global color.ui auto
 {% endhighlight %}
+
 
 
 
