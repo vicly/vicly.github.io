@@ -10,116 +10,17 @@ tags:
 ---
 
 
-## ToBeOrg
-
-
+## Task vs. method
 {% highlight groovy %}
-
-//
-// Skip a task
-//
-task hello << {
-    println 'hello world'
+// this is task
+task myTask << {
+    fileList('aDir').each {File file -> ...} // call method
 }
-hello.onlyIf { !project.hasProperty('skipHello') }
-
-
-//
-// Dynamically create task
-//
-["env1", "env2"].each { environment ->
-  def enviromentCapitalized = environment.capitalize()
-  task("conf${enviromentCapitalized}", dependsOn: "init${enviromentCapitalized}Config", type: Tar) {
-    // xxx
-  }
-  task("init${enviromentCapitalized}Config", type: Copy) {
-    // xxx
-  }
+// this is method
+File[] fileList(String dir) {
+    file(dir).listFiles( { file -> file.isFile() } as FileFilter ).sort() 
 }
-
-//
-// Add integTest sourceSet
-//
-apply plugin: "java"
- 
-sourceSets {
-    // Note that just declaring this sourceset creates two configurations.
-    intTest {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-        }
-    }
-}
- 
-configurations {
-    intTestCompile.extendsFrom testCompile
-    intTestRuntime.extendsFrom testRuntime
-}
- 
-task intTest(type:Test){
-    description = "Run integration tests (located in src/intTest/...)."
-    testClassesDir = project.sourceSets.intTest.output.classesDir
-    classpath = project.sourceSets.intTest.runtimeClasspath
-}
-
-//
-// Wrap ant task
-//
-configurations {
-    ftpAntTask
-}
- 
-dependencies {
-    ftpAntTask("org.apache.ant:ant-commons-net:1.8.4") {
-        module("commons-net:commons-net:1.4.1") {
-            dependencies "oro:oro:2.0.8:jar"
-        }
-    }
-}
- 
-task ftp << {
-    ant {
-        taskdef(name: 'ftp',
-                classname: 'org.apache.tools.ant.taskdefs.optional.net.FTP',
-                classpath: configurations.ftpAntTask.asPath)
-        ftp(server: "ftp.apache.org", userid: "anonymous", password: "me@myorg.com") {
-            fileset(dir: "htdocs/manual")
-        }
-    }
-}
-
-//
-// Overwrite a task
-//
-task copy(type: Copy)
- 
-task copy(overwrite: true) << {
-    println('I am the new one.')
-}
-
-
-//
-// Calculate resolved dependencies
-//
-def finalJarList = []
-project(':myProject').configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies.each { directDep ->
-    addChildsToList(finalJarList, directDep)
-}
- 
- 
-def addChildsToList(def container, def pResolvedDependency) {
-    if (!container.contains(pResolvedDependency.name)) {
-        container << pResolvedDependency.name
-    }
-    pResolvedDependency.children.each {
-        addChildsToList(container, it)
-    }
-}
-
 {% endhighlight %}
-
-
 
 
 ## Incremental build
@@ -197,6 +98,21 @@ $ gradle testUserServiceProxy
 {% endhighlight %}
 
 
+## Invoke task in another gradle script
+{% highlight groovy %}
+// build.gradle
+task build(type: GradleBuild) {
+    buildFile = 'other.gradle'
+    tasks = ['myTask1', 'myTask2']
+}
+ 
+// other.gradle
+task myTask1 << { ... }
+task myTask2 << { ... }
+{% endhighlight %}
+
+
+
 ## Resolve files, dependencies
 {% highlight groovy %}
 // To get the resolved files, iterate over the configuration or call its getFiles() method. 
@@ -241,7 +157,7 @@ configurations {
 dependencies {
     // copy findbugs and declared transitive jars
     findbugs module('com.google.code.findbugs:findbugs:2.0.1') {
-        // just copy jaxen, don't copy its transitive
+        // just copy jaxen, don't copy its transitive dependencies
         dependency("jaxen:jaxen:1.1.1") {
             transitive = false
         }
@@ -256,24 +172,156 @@ task copyFindBugs(type: Copy) {
 {% endhighlight %}
 
 
-## gradle.properties
+
+## Copy and rename
+{% highlight groovy %}
+copy {
+    from "${buildDir}/tmp/warApplication/WEB-INF/classes"
+    into "${buildDir}/tmp/warApplication/WEB-INF/classes"
+    include "${thidsProjectName}.jar.properties"
+    rename (/([a-z]+)\.jar\.([a-z]+)/, 'newname.jar.$2')
+}
+{% endhighlight %}
+
+
+## Add integTest sourceSet
+{% highlight groovy %}
+apply plugin: "java"
+ 
+sourceSets {
+    // Note that just declaring this sourceset creates two configurations.
+    intTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+    }
+}
+ 
+configurations {
+    intTestCompile.extendsFrom testCompile
+    intTestRuntime.extendsFrom testRuntime
+}
+ 
+task intTest(type:Test){
+    description = "Run integration tests (located in src/intTest/...)."
+    testClassesDir = project.sourceSets.intTest.output.classesDir
+    classpath = project.sourceSets.intTest.runtimeClasspath
+}
+{% endhighlight %}
+
+
+## Dynamically create task
+{% highlight groovy %}
+["env1", "env2"].each { environment ->
+  def enviromentCapitalized = environment.capitalize()
+  task("conf${enviromentCapitalized}", dependsOn: "init${enviromentCapitalized}Config", type: Tar) {
+    // xxx
+  }
+  task("init${enviromentCapitalized}Config", type: Copy) {
+    // xxx
+  }
+}
+{% endhighlight %}
+
+
+## Calculate resolved dependencies
+{% highlight groovy %}
+def finalJarList = []
+project(':myProject').configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies.each { directDep ->
+    addChildsToList(finalJarList, directDep)
+}
+ 
+ 
+def addChildsToList(def container, def pResolvedDependency) {
+    if (!container.contains(pResolvedDependency.name)) {
+        container << pResolvedDependency.name
+    }
+    pResolvedDependency.children.each {
+        addChildsToList(container, it)
+    }
+}
+{% endhighlight %}
+
+
+## Wrap ANT task
+{% highlight groovy %}
+configurations {
+    ftpAntTask
+}
+ 
+dependencies {
+    ftpAntTask("org.apache.ant:ant-commons-net:1.8.4") {
+        module("commons-net:commons-net:1.4.1") {
+            dependencies "oro:oro:2.0.8:jar"
+        }
+    }
+}
+ 
+task ftp << {
+    ant {
+        taskdef(name: 'ftp',
+                classname: 'org.apache.tools.ant.taskdefs.optional.net.FTP',
+                classpath: configurations.ftpAntTask.asPath)
+        ftp(server: "ftp.apache.org", userid: "anonymous", password: "me@myorg.com") {
+            fileset(dir: "htdocs/manual")
+        }
+    }
+}
+{% endhighlight %}
+
+
+## Skip a task
+{% highlight groovy %}
+task hello << {
+    println 'hello world'
+}
+hello.onlyIf { !project.hasProperty('skipHello') }
+{% endhighlight %}
+
+
+## Overwrite a task
+{% highlight groovy %}
+task copy(type: Copy)
+ 
+task copy(overwrite: true) << {
+    println('I am the new one.')
+}
+{% endhighlight %}
+
+
+## Task dependency
+{% highlight groovy %}
+taskX.dependsOn taskY    // by task, taskY must be defined before taskX
+taskX.dependsOn 'taskY'  // by name, no above constraint
+
+taskX.dependsOn {
+    tasks.findAll { task -> task.name.startsWith('lib') }
+}
+{% endhighlight %}
+
+
+
+
+## gradle.properties notes
 
 * automatically be loaded
 * each project can has this file
 * the property name can directly be used as variable in gradle script
-* using prefix systemProp to define system property in this file, e.g. systemProp.mySysProp=sysPropValue
-*  -PmyProp=newValue  CLI parameter
+* using prefix `systemProp` to define system property in `gradle.properties` file, e.g. `systemProp.mySysProp=sysPropValue`
+* `-PmyProp=newValue` CLI parameter
  * define a normal property (NOT system property)
- * will overwrite myProp defined in gradle.properties
- * will NOT overwrite the system property with the same name
+ * will overwrite `myProp` defined in `gradle.properties`
+ * will **_NOT_** overwrite the system property with the same name
 * Normal property and System property are saved in two different buckets, system property can be overwritten by System.setProperty(NAME, VALUE)
 
 
-
-
-
 ## Misc
-* $rootDir will be locked on Windows, while not on Linux. don't try to copy file to $rootDir, better to a sub folder
-* Get project's artifacts: project.configurations.archives.artifacts*.file
-* Resource output : sourceSets.main.output.resourcesDir
-* Maven classifier : compile "org.gradle.test.classifiers:service:1.0:jdk15@jar"
+* on Windows, when running gradle, `$rootDir` will be locked, Linux has not such problem, so don't WRITE `$rootDir`, e.g. create file, use a sub folder
+* Get project's artifacts: `project.configurations.archives.artifacts*.file`
+* Resource output: `sourceSets.main.output.resourcesDir`
+* Maven classifier: `compile "org.gradle.test.classifiers:service:1.0:jdk15@jar"`
+* `<<` is simply an alias for `doLast`
+* Set default tasks: `defaultTasks: 'clean', 'run'`
+* If a task is not defined in subproject, it will try to use the one in parent (if defined)
+
