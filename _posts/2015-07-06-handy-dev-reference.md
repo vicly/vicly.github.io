@@ -324,7 +324,7 @@ git branch -d hotfix-#001
 use new feature `sparse checkout` since `Git 1.7`
 {% highlight bash %}
 # 1. clone
-git clone git @bitbucket.org:Propellerhead/uconnect.git
+git clone git @bitbucket.org:mycompany/myproject.git
 
 # 2. open feature
 git config core.sparsecheckout true
@@ -332,7 +332,7 @@ git config core.sparsecheckout true
 # 3. add the module or files you want
 echo build.gradle > .git/info/sparse-checkout
 echo settings.gradle >> .git/info/sparse-checkout
-echo nz.co.uconnect.config >> .git/info/sparse-checkout
+echo myproject.properties >> .git/info/sparse-checkout
  
 # 4. take effect
 git read-tree -m -u HEAD
