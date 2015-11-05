@@ -164,7 +164,7 @@ git rebase master
  
 # Merge
 git checkout master
-git merge feature-test
+git merge feature-test           # for single commit, add --squash
 git push
 # might need solve conflict
 git branch -d feature-test       # remove feature branch
@@ -492,6 +492,33 @@ uname -mrs
 # content only from file 2
 #
 grep -Fvxf file1 file2
+
+#
+# Sed, extract data
+#
+grep 'Payload:' xyz.txt | sed -n 's/Payload:.*"created":"\(.*\)",.*"driverLicenseNumber":"\(.*\)","driverId":\(.*\),"snapshotIdentifier":"\(.*\)","snapshotTime":"\(.*\)","pdfContent":.*/\1,\2,\3,\4/p' | less
+
+#
+# Block/Unblock Wifi/Bluetooth
+#
+rfkill block wlan
+rfkill unblock wlan
+rfkill block bluetooth
+rfkill unblock bluetooth
+
+#
+# Check Speed
+#
+# RAM
+sudo dmidecode -t 17 | awk -F":" '/Speed/ { print $2 }'
+# Hard Disk Read/Write Speed
+sudo hdparm -tT /dev/sda
+
+#
+# Monitor Network Usage
+#
+sudo apt-get install iptraf
+sudo iptraf
 
 
 {% endhighlight %}
