@@ -227,6 +227,10 @@ git add ..
 git commit -c ORIG_HEAD
 {% endhighlight %}
 
+### Modify last commit message
+{% highlight bash %}
+git commit --amend -m 'new message'
+{% endhighlight %}
 
 #### Remove a commit
 {% highlight bash %}
@@ -467,6 +471,11 @@ unzip -p my.zip path/to/zipped/file.txt // to console
 tcpdump -vvnnSX dst port 5006 and dst host 172.31.225.100
 
 #
+# View ports
+#
+netstat -antlp
+
+#
 # list file sorted by date descending
 #
 ls -rt
@@ -497,6 +506,11 @@ grep -Fvxf file1 file2
 # Sed, extract data
 #
 grep 'Payload:' xyz.txt | sed -n 's/Payload:.*"created":"\(.*\)",.*"driverLicenseNumber":"\(.*\)","driverId":\(.*\),"snapshotIdentifier":"\(.*\)","snapshotTime":"\(.*\)","pdfContent":.*/\1,\2,\3,\4/p' | less
+
+# second-last word "aaa.bbb.ccc => bbb"
+cat regression-test-result.txt | sed -n 's/nz.*\.\([a-zA-Z0-9]\+\)\.[a-zA-Z0-9]\+/\1/p' | uniq | sort
+
+
 
 #
 # Block/Unblock Wifi/Bluetooth
